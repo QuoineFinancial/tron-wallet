@@ -1,0 +1,51 @@
+{
+  "name": "@cobo/tron",
+  "version": "0.1.0",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.umd.js",
+  "react-native": "dist/index.esm.js",
+  "dependencies": {
+    "@tronprotocol/wallet-api": "^0.0.29",
+    "axios": "^0.18.0",
+    "bip39": "^2.5.0",
+    "hdkey": "^0.8.0",
+    "qs": "^6.5.1",
+    "safe-buffer": "^5.1.1",
+    "secp256k1": "^3.5.0",
+    "tronaccount": "0.0.29",
+    "wif": "^2.0.6"
+  },
+  "devDependencies": {
+    "coveralls": "^3.0.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.1.1",
+    "nyc": "^11.7.1",
+    "rollup": "^0.58.0",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "standard": "^11.0.1"
+  },
+  "scripts": {
+    "lint": "standard",
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "npm run lint && npm run build && mocha --timeout 10000",
+    "coverage": "nyc --reporter=html --reporter=text mocha --timeout 10000",
+    "coveralls": "npm run coverage && nyc report --reporter=text-lcov | coveralls"
+  },
+  "files": [
+    "dist"
+  ],
+  "standard": {
+    "globals": [
+      "describe",
+      "it",
+      "expect"
+    ],
+    "ignore": [
+      "dist/**"
+    ]
+  }
+}
