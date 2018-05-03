@@ -9,9 +9,37 @@ describe('Tron Wallet', function () {
 
   it('Can get tron account from HD wallet structure', () => {
     const account = node.getAccount()
+    console.log(node.getPrivateKey())
     assert.equal(account.address, '27QXjqR1iz6DhRNPj9PXx7W6h6NwM3r4gT2')
     assert.equal(account.privateKey, '2EBF15FCEF9CEF30CA13731FD08CEB6F4F7C5E1C2A5794977068FD9BAC2E2DAC')
     assert.equal(account.password, 'Lr8V/O+c7zDKE3Mf0Izrb098XhwqV5SXcGj9m6wuLaw=')
+  })
+
+  it('Can generate new mnemonic and import', () => {
+    const myMnemonic = TronWallet.generateMnemonic()
+    const node = TronWallet.fromMnemonic(myMnemonic)
+    assert(node.getAddress())
+  })
+
+  it('Can import from base58 string', () => {
+    const node = TronWallet.fromExtendedKey('xprv9s21ZrQH143K27GwrJ5SPAZc9KPn8i8gkjeXcQe5vPtRPgUDyoq8qrh4qCRPwZAxzP8abdc9nZduW7UDYN1B5V6rjhc3YPMXzr9ArHaM4M6')
+    assert(node.getAddress())
+  })
+
+  it('Can import from private key', () => {
+    const node = TronWallet.fromPrivateKey('2ebf15fcef9cef30ca13731fd08ceb6f4f7c5e1c2a5794977068fd9bac2e2dac')
+    assert.equal(node.getAddress(), '27QXjqR1iz6DhRNPj9PXx7W6h6NwM3r4gT2')
+    assert.throws(() => node.derivePath('123'), Error)
+    assert.throws(() => node.getPublicExtendedKey(), Error)
+  })
+
+  it('Can derive to child nodes and get address', () => {
+    const parentNode = TronWallet.fromMasterSeed(seed)
+    const node1 = parentNode.derivePath("m/44'/194'/0'/0/0")
+    assert.equal(node1.getAddress(), '27Vsbb84NX6hNgR7kAGwi74BAXV7TdCcHTp')
+
+    const node2 = parentNode.deriveChild(0)
+    assert.equal(node2.getAddress(), '27Qy2jqg5KLzwKxz4HYxabqqiEkAkBWb4aN')
   })
 
   it('Can get address balance', async () => {
