@@ -47,6 +47,10 @@ describe('Tron Wallet', function () {
     return data
   })
 
+  it('Can get all vote data', async () => {
+    return node.getWitnesses()
+  })
+
   it('Can vote to some account', async () => {
     const res = await node.vote([{
       address: '27WK11uSBUjxmnbtQ3AArs1hLpUkPg4WAJF',

@@ -125,7 +125,7 @@ class TronWallet {
   }
 
   async getWitnesses () {
-    
+    return this.tronClient.getWitnesses()
   }
 
   async vote (data) {
