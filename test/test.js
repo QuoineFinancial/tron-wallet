@@ -9,7 +9,7 @@ describe('Tron Wallet', function () {
 
   it('Can get tron account from HD wallet structure', () => {
     const account = node.getAccount()
-    console.log(node.getPrivateKey())
+    console.log(node.getPrivateKey().toString('hex'))
     assert.equal(account.address, '27QXjqR1iz6DhRNPj9PXx7W6h6NwM3r4gT2')
     assert.equal(account.privateKey, '2EBF15FCEF9CEF30CA13731FD08CEB6F4F7C5E1C2A5794977068FD9BAC2E2DAC')
     assert.equal(account.password, 'Lr8V/O+c7zDKE3Mf0Izrb098XhwqV5SXcGj9m6wuLaw=')
@@ -24,13 +24,6 @@ describe('Tron Wallet', function () {
   it('Can import from base58 string', () => {
     const node = TronWallet.fromExtendedKey('xprv9s21ZrQH143K27GwrJ5SPAZc9KPn8i8gkjeXcQe5vPtRPgUDyoq8qrh4qCRPwZAxzP8abdc9nZduW7UDYN1B5V6rjhc3YPMXzr9ArHaM4M6')
     assert(node.getAddress())
-  })
-
-  it('Can import from private key', () => {
-    const node = TronWallet.fromPrivateKey('2ebf15fcef9cef30ca13731fd08ceb6f4f7c5e1c2a5794977068fd9bac2e2dac')
-    assert.equal(node.getAddress(), '27QXjqR1iz6DhRNPj9PXx7W6h6NwM3r4gT2')
-    assert.throws(() => node.derivePath('123'), Error)
-    assert.throws(() => node.getPublicExtendedKey(), Error)
   })
 
   it('Can derive to child nodes and get address', () => {
@@ -49,7 +42,7 @@ describe('Tron Wallet', function () {
   })
 
   it('Can get raw transaction data from RPC', async () => {
-    const data = await node.generateTransaction('27kyrBy6aQyjxMPL6XNCjwdHooL7fJNTwxY', 500)
+    const data = await node.generateTransaction('27kyrBy6aQyjxMPL6XNCjwdHooL7fJNTwxY', 5000000)
     console.log('raw data: ', data)
     return data
   })
@@ -64,7 +57,7 @@ describe('Tron Wallet', function () {
   })
 
   it('Can transfer TRX', async () => {
-    const res = await node.transfer('27kyrBy6aQyjxMPL6XNCjwdHooL7fJNTwxY', 1)
+    const res = await node.transfer('27kyrBy6aQyjxMPL6XNCjwdHooL7fJNTwxY', 1000000)
     console.log('transfer res: ', res)
     return res
   })

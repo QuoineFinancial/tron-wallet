@@ -5,7 +5,8 @@ import assert from 'assert'
 import hdkey from 'hdkey'
 import secp256k1 from 'secp256k1'
 import { Buffer } from 'safe-buffer'
-import HttpClient from 'tronaccount/src/client/http'
+// import HttpClient from 'tronaccount/src/client/http'
+import { HttpClient } from '@tronprotocol/wallet-api'
 import { byteArray2hexStr } from '@tronprotocol/wallet-api/src/utils/bytes'
 import { hexStr2byteArray, base64EncodeToString } from '@tronprotocol/wallet-api/src/lib/code'
 import { getBase58CheckAddress, getAddressFromPriKey } from '@tronprotocol/wallet-api/src/utils/crypto'
@@ -86,7 +87,7 @@ class TronWallet {
 
   getPrivateKey () {
     assert(this._node._privateKey, 'can not get private when generate from public key')
-    return this._node._privateKey
+    return this._node.privateKey
   }
 
   getAddress () {
@@ -119,12 +120,18 @@ class TronWallet {
   }
 
   async transfer (to, amount, token = 'TRX') {
+    // return this.tronClient.send(this.getTronPassword(), token, to, amount)
     return this.tronClient.send(this.getTronPassword(), token, to, amount)
+  }
+
+  async getWitnesses () {
+    
   }
 
   async vote (data) {
     // [{address: '', amount: 10}, {address: '', amount: 10}]
     return this.tronClient.voteForWitnesses(this.getTronPassword(), data)
+    // return this.tronClient.voteForWitnesses('Ryu5X4bQwKgIKIjfmNS73HQFFFKyFjbCybjj14FZWtQ=', data)
   }
 
   async generateTransaction (to, amount, token = 'TRX') {
