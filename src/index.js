@@ -5,11 +5,12 @@ import assert from 'assert'
 import hdkey from 'hdkey'
 import secp256k1 from 'secp256k1'
 import { Buffer } from 'safe-buffer'
-// import HttpClient from 'tronaccount/src/client/http'
-import { HttpClient } from '@tronprotocol/wallet-api'
+import HttpClient from 'tronaccount/src/client/http'
 import { byteArray2hexStr } from '@tronprotocol/wallet-api/src/utils/bytes'
 import { hexStr2byteArray, base64EncodeToString } from '@tronprotocol/wallet-api/src/lib/code'
 import { getBase58CheckAddress, getAddressFromPriKey } from '@tronprotocol/wallet-api/src/utils/crypto'
+import { contractBuilder, buildTransferContract, addRef, sign } from './transactionBuilder'
+import { deserializeTransaction } from '@tronprotocol/wallet-api/src/protocol/serializer'
 
 class TronWallet {
   static generateMnemonic () {
@@ -113,6 +114,17 @@ class TronWallet {
 
   getClient () {
     return this.tronClient
+  }
+
+  generateTransactionOffline (hash, number, to, amount) {
+    const contract = contractBuilder(this.getAddress(), to, amount)
+    const tx = buildTransferContract(contract, 'TransferContract')
+    const finalTx = addRef(tx, { hash, number })
+    const signedTx = sign(this.getTronPassword(), finalTx)
+
+    console.log(deserializeTransaction(finalTx))
+
+    console.log(JSON.stringify(signedTx, null, 2))
   }
 
   async getBalance () {

@@ -1,12 +1,13 @@
 {
   "name": "@cobo/tron",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",
   "react-native": "dist/index.esm.js",
   "dependencies": {
-    "@tronprotocol/wallet-api": "^0.0.29",
+    "@tronprotocol/wallet-api": "^0.0.35",
+    "atob": "^2.1.1",
     "axios": "^0.18.0",
     "bip39": "^2.5.0",
     "hdkey": "^0.8.0",
