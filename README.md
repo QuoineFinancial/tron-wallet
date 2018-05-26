@@ -6,6 +6,10 @@
 
 You will create a tron HD instance and use the methods of the instance:
 
+```
+yarn add tron-wallet
+```
+
 **Static Methods:**
 
 * `fromMasterSeed` - Create HD instance from a master seed
@@ -21,8 +25,20 @@ You will create a tron HD instance and use the methods of the instance:
 * `getPrivateExtendedKey` - Return the private extend key (base58)
 * `getPublicExtendedKey` - Return the public extend key (base58)
 * `getAddress` - Return the tron address
-* `getAccount` - Return the tron account (`{privateKey, address, password}`)
-* `getBalance` - Return balance of the account
+* `generateTransaction` - Return a tron transaction
+  * `latestBlock` - lastest tron block from any api backend
+  * `to` - the address you want to send to
+  * `amount` - 1000000 = 1 TRX
+  ```JavaScript
+  const latestBlock = {
+    hash: 'e996dc5c0ecc96773d31d1cdd6e9db3140cdfcd6fcdbaadfc65ab3e4ad7b352f',
+    number: 195022,
+    timestamp: 1527312435000
+  }
+  return Tron
+    .fromMnemonic('alice bob')
+    .generateTransactionOffline(latestBlock, '27Vsbb84NX6hNgR7kAGwi74BAXV7TdCcHTp', 100000000)
+  ```
 
 ### Examples
 

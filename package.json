@@ -1,20 +1,20 @@
 {
-  "name": "@cobo/tron",
-  "version": "0.1.1",
+  "name": "tron-wallet",
+  "version": "0.1.2",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",
   "react-native": "dist/index.esm.js",
   "dependencies": {
-    "@tronprotocol/wallet-api": "^0.0.35",
-    "atob": "^2.1.1",
-    "axios": "^0.18.0",
+    "@tronscan/client": "^0.0.6",
     "bip39": "^2.5.0",
+    "bs58": "^4.0.1",
     "hdkey": "^0.8.0",
+    "js-sha3": "^0.7.0",
+    "jssha": "^2.3.1",
     "qs": "^6.5.1",
     "safe-buffer": "^5.1.1",
     "secp256k1": "^3.5.0",
-    "tronaccount": "0.0.29",
     "wif": "^2.0.6"
   },
   "devDependencies": {

@@ -1,40 +1,42 @@
-import xhr from 'axios'
-import qs from 'qs'
 import bip39 from 'bip39'
 import assert from 'assert'
 import hdkey from 'hdkey'
 import secp256k1 from 'secp256k1'
 import { Buffer } from 'safe-buffer'
-import HttpClient from 'tronaccount/src/client/http'
-import { byteArray2hexStr } from '@tronprotocol/wallet-api/src/utils/bytes'
-import { hexStr2byteArray, base64EncodeToString } from '@tronprotocol/wallet-api/src/lib/code'
-import { getBase58CheckAddress, getAddressFromPriKey } from '@tronprotocol/wallet-api/src/utils/crypto'
-import { contractBuilder, buildTransferContract, addRef, sign } from './transactionBuilder'
-import { deserializeTransaction } from '@tronprotocol/wallet-api/src/protocol/serializer'
+import { buildTransferTransaction } from '@tronscan/client/src/utils/transactionBuilder'
+import { signTransaction } from '@tronscan/client/src/utils/crypto'
+import { addRef } from './transactionBuilder'
+import {
+  computeAddress,
+  getBase58CheckAddress,
+  byteArray2hexStr,
+  hexStr2byteArray,
+  getPubKeyFromPriKey
+} from './address'
 
 class TronWallet {
   static generateMnemonic () {
     return bip39.generateMnemonic()
   }
 
-  static fromMnemonic (mnemonic, provider) {
+  static fromMnemonic (mnemonic) {
     const seed = bip39.mnemonicToSeedHex(mnemonic)
-    return new this({ seed, url: provider })
+    return new this({ seed })
   }
 
-  static fromMasterSeed (seed, provider) {
-    return new this({ seed, url: provider })
+  static fromMasterSeed (seed) {
+    return new this({ seed })
   }
 
-  static fromExtendedKey (extendedKey, provider) {
-    return new this({ extendedKey, url: provider })
+  static fromExtendedKey (extendedKey) {
+    return new this({ extendedKey })
   }
 
-  static fromPrivateKey (privateKey, provider) {
-    return new this({ privateKey, url: provider })
+  static fromPrivateKey (privateKey) {
+    return new this({ privateKey })
   }
 
-  constructor ({ seed, extendedKey, privateKey, url = 'https://tronscan.io' }) {
+  constructor ({ seed, extendedKey, privateKey }) {
     if (seed) {
       this._seed = seed
       this._node = hdkey.fromMasterSeed(Buffer(seed, 'hex'))
@@ -50,8 +52,6 @@ class TronWallet {
         _privateKey: privateKey
       }
     }
-    this.tronClient = new HttpClient({ url })
-    this.url = url
     this._init()
   }
 
@@ -91,78 +91,20 @@ class TronWallet {
     return this._node.privateKey
   }
 
-  getAddress () {
-    const addressBytes = getAddressFromPriKey(this._priKeyBytes)
-    return getBase58CheckAddress(addressBytes)
-  }
-
-  getTronPassword () {
-    return base64EncodeToString(this._priKeyBytes)
-  }
-
   getTronPrivateKey () {
     return byteArray2hexStr(this._priKeyBytes)
   }
 
-  getAccount () {
-    return {
-      privateKey: this.getTronPrivateKey(),
-      address: this.getAddress(),
-      password: this.getTronPassword()
-    }
+  getAddress () {
+    const addressBytes = computeAddress(getPubKeyFromPriKey(this._priKeyBytes))
+    return getBase58CheckAddress(addressBytes)
   }
 
-  getClient () {
-    return this.tronClient
-  }
-
-  generateTransactionOffline (hash, number, to, amount) {
-    const contract = contractBuilder(this.getAddress(), to, amount)
-    const tx = buildTransferContract(contract, 'TransferContract')
-    const finalTx = addRef(tx, { hash, number })
-    const signedTx = sign(this.getTronPassword(), finalTx)
-
-    console.log(deserializeTransaction(finalTx))
-
-    console.log(JSON.stringify(signedTx, null, 2))
-  }
-
-  async getBalance () {
-    return this.tronClient.getAccountBalances(this.getAddress())
-  }
-
-  async transfer (to, amount, token = 'TRX') {
-    // return this.tronClient.send(this.getTronPassword(), token, to, amount)
-    return this.tronClient.send(this.getTronPassword(), token, to, amount)
-  }
-
-  async getWitnesses () {
-    return this.tronClient.getWitnesses()
-  }
-
-  async vote (data) {
-    // [{address: '', amount: 10}, {address: '', amount: 10}]
-    return this.tronClient.voteForWitnesses(this.getTronPassword(), data)
-    // return this.tronClient.voteForWitnesses('Ryu5X4bQwKgIKIjfmNS73HQFFFKyFjbCybjj14FZWtQ=', data)
-  }
-
-  async generateTransaction (to, amount, token = 'TRX') {
-    if (token.toUpperCase() === 'TRX') {
-      const { data } = await xhr.post(`${this.url}/sendCoinToView`, qs.stringify({
-        Address: this.getAddress(),
-        toAddress: to,
-        Amount: amount
-      }))
-      return data
-    } else {
-      const { data } = await xhr.post(`${this.url}/TransferAssetToView`, qs.stringify({
-        assetName: token,
-        Address: this.getAddress(),
-        toAddress: to,
-        Amount: amount
-      }))
-      return data
-    }
+  generateTransaction (latestBlock, to, amount) {
+    const transaction = buildTransferTransaction('TRX', this.getAddress(), to, amount)
+    const transactionWithRefs = addRef(transaction, latestBlock)
+    const signed = signTransaction(this.getTronPrivateKey(), transactionWithRefs)
+    return signed
   }
 }
 
