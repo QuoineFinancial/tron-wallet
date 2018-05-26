@@ -1,6 +1,6 @@
 {
-  "name": "tron-wallet",
-  "version": "0.1.2",
+  "name": "@cobo/tron",
+  "version": "0.1.3",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",

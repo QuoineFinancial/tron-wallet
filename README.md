@@ -7,7 +7,7 @@
 You will create a tron HD instance and use the methods of the instance:
 
 ```
-yarn add tron-wallet
+yarn add @cobo/tron
 ```
 
 **Static Methods:**
