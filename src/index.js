@@ -5,6 +5,7 @@ import secp256k1 from 'secp256k1'
 import { Buffer } from 'safe-buffer'
 import { buildTransferTransaction } from '@tronscan/client/src/utils/transactionBuilder'
 import { signTransaction } from '@tronscan/client/src/utils/crypto'
+import JSSHA from 'jssha'
 import { addRef } from './transactionBuilder'
 import {
   computeAddress,
@@ -104,7 +105,10 @@ class TronWallet {
     const transaction = buildTransferTransaction('TRX', this.getAddress(), to, amount)
     const transactionWithRefs = addRef(transaction, latestBlock)
     const signed = signTransaction(this.getTronPrivateKey(), transactionWithRefs)
-    return signed
+    const shaObj = new JSSHA('SHA-256', 'HEX')
+    shaObj.update(signed.hex)
+    const txid = shaObj.getHash('HEX')
+    return { txid, ...signed }
   }
 }
 
