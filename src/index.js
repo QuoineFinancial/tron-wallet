@@ -37,6 +37,10 @@ class TronWallet {
     return new this({ privateKey })
   }
 
+  static fromTronPrivateKey (pk) {
+    return new this({ privateKey: Buffer(pk, 'hex') })
+  }
+
   constructor ({ seed, extendedKey, privateKey }) {
     if (seed) {
       this._seed = seed
@@ -89,7 +93,7 @@ class TronWallet {
 
   getPrivateKey () {
     assert(this._node._privateKey, 'can not get private when generate from public key')
-    return this._node.privateKey
+    return this._node._privateKey
   }
 
   getTronPrivateKey () {

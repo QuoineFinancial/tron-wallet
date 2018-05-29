@@ -1,5 +1,6 @@
 // const assert = require('assert')
 const bip39 = require('bip39')
+const fetch = require('node-fetch')
 const TronWallet = require('../')
 const mnemonic = 'cobo wallet is awesome'
 const assert = require('assert')
@@ -30,6 +31,19 @@ describe('Tron Wallet', function () {
     assert.equal(node1.getAddress(), '27Vsbb84NX6hNgR7kAGwi74BAXV7TdCcHTp')
     const node2 = parentNode.deriveChild(0)
     assert.equal(node2.getAddress(), '27Qy2jqg5KLzwKxz4HYxabqqiEkAkBWb4aN')
+  })
+
+  it('Can generate from tron private key', async () => {
+    // 43B75088348B0E2F0B5FABC6F43CF5C084B0010FBFA2D86160A70E5AF7E17E56
+    const res = await fetch('https://api.tronscan.org/api/block?sort=-timestamp&limit=1')
+    const { data } = await res.json()
+    const pk = '43B75088348B0E2F0B5FABC6F43CF5C084B0010FBFA2D86160A70E5AF7E17E56'
+    const node1 = TronWallet.fromTronPrivateKey(pk)
+    console.log(node1.getAddress())
+    const tx = node1.generateTransaction(data[0], '27jbeW2CXojGNeStwX4KEqvwj8aYNLmJ55P', 1000000)
+    console.log('Trasaction is: ', JSON.stringify(tx.transaction.toObject(), null, 2))
+    console.log('Hex is: ', tx.hex)
+    return tx
   })
 
   it('Cen generate transaction offline', () => {
