@@ -3,7 +3,15 @@ import assert from 'assert'
 import hdkey from 'hdkey'
 import secp256k1 from 'secp256k1'
 import { Buffer } from 'safe-buffer'
-import { buildTransferTransaction } from '@tronscan/client/src/utils/transactionBuilder'
+import {
+  buildTransferTransaction,
+  buildAccountUpdate,
+  buildVote,
+  buildFreezeBalance,
+  buildUnfreezeBalance,
+  buildAssetIssue,
+  buildAssetParticipate
+} from '@tronscan/client/src/utils/transactionBuilder'
 import { signTransaction } from '@tronscan/client/src/utils/crypto'
 import JSSHA from 'jssha'
 import { addRef } from './transactionBuilder'
@@ -105,14 +113,48 @@ class TronWallet {
     return getBase58CheckAddress(addressBytes)
   }
 
-  generateTransaction (latestBlock, to, amount) {
-    const transaction = buildTransferTransaction('TRX', this.getAddress(), to, amount)
-    const transactionWithRefs = addRef(transaction, latestBlock)
+  updateTransaction (tx, latestBlock) {
+    const transactionWithRefs = addRef(tx, latestBlock)
     const signed = signTransaction(this.getTronPrivateKey(), transactionWithRefs)
     const shaObj = new JSSHA('SHA-256', 'HEX')
     shaObj.update(signed.hex)
     const txid = shaObj.getHash('HEX')
     return { txid, ...signed }
+  }
+
+  generateTransaction (to, amount, token = 'TRX', latestBlock) {
+    const transaction = buildTransferTransaction(token, this.getAddress(), to, amount)
+    return this.updateTransaction(transaction, latestBlock)
+  }
+
+  updateAccount (name, latestBlock) {
+    const transaction = buildAccountUpdate(this.getAddress(), name)
+    return this.updateTransaction(transaction, latestBlock)
+  }
+
+  freeze (amount, duration = 3, latestBlock) {
+    const transaction = buildFreezeBalance(this.getAddress(), amount, duration)
+    return this.updateTransaction(transaction, latestBlock)
+  }
+
+  unfreeze (latestBlock) {
+    const transaction = buildUnfreezeBalance(this.getAddress())
+    return this.updateTransaction(transaction, latestBlock)
+  }
+
+  vote (votes, latestBlock) {
+    const transaction = buildVote(this.getAddress(), votes)
+    return this.updateTransaction(transaction, latestBlock)
+  }
+
+  issueAssets (options, latestBlock) {
+    const transaction = buildAssetIssue(options, latestBlock)
+    return this.updateTransaction(transaction, latestBlock)
+  }
+
+  buyAssets (issuer, token, amount, latestBlock) {
+    const transaction = buildAssetParticipate(this.getAddress(), issuer, token, amount)
+    return this.updateTransaction(transaction, latestBlock)
   }
 }
 

@@ -1,12 +1,12 @@
 {
   "name": "@cobo/tron",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",
   "react-native": "dist/index.esm.js",
   "dependencies": {
-    "@tronscan/client": "^0.0.6",
+    "@tronscan/client": "^0.1.1",
     "bip39": "^2.5.0",
     "bs58": "^4.0.1",
     "hdkey": "^0.8.0",

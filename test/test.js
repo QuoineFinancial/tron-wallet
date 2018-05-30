@@ -8,10 +8,13 @@ const seed = bip39.mnemonicToSeedHex(mnemonic)
 
 describe('Tron Wallet', function () {
   const node = TronWallet.fromMasterSeed(seed)
+  const pk = '43B75088348B0E2F0B5FABC6F43CF5C084B0010FBFA2D86160A70E5AF7E17E56'
+  const node1 = TronWallet.fromTronPrivateKey(pk)
 
   it('Can get tron account from HD wallet structure', () => {
     assert.equal(node.getAddress(), '27QXjqR1iz6DhRNPj9PXx7W6h6NwM3r4gT2')
     assert.equal(node.getTronPrivateKey(), '2EBF15FCEF9CEF30CA13731FD08CEB6F4F7C5E1C2A5794977068FD9BAC2E2DAC')
+    assert.equal(node1.getAddress(), '27UozX7c7y8iXJRQ9La9kwGozokGnBURhfV')
   })
 
   it('Can generate new mnemonic and import', () => {
@@ -37,11 +40,7 @@ describe('Tron Wallet', function () {
     // 43B75088348B0E2F0B5FABC6F43CF5C084B0010FBFA2D86160A70E5AF7E17E56
     const res = await fetch('https://api.tronscan.org/api/block?sort=-timestamp&limit=1')
     const { data } = await res.json()
-    const pk = '43B75088348B0E2F0B5FABC6F43CF5C084B0010FBFA2D86160A70E5AF7E17E56'
-    const node1 = TronWallet.fromTronPrivateKey(pk)
-    console.log(node1.getAddress())
-    const tx = node1.generateTransaction(data[0], '27jbeW2CXojGNeStwX4KEqvwj8aYNLmJ55P', 1000000)
-    console.log('Trasaction is: ', JSON.stringify(tx.transaction.toObject(), null, 2))
+    const tx = node1.generateTransaction('27jbeW2CXojGNeStwX4KEqvwj8aYNLmJ55P', 1000000, 'TRX', data[0])
     console.log('Hex is: ', tx.hex)
     return tx
   })
@@ -52,6 +51,22 @@ describe('Tron Wallet', function () {
       number: 195022,
       timestamp: 1527312435000
     }
-    return node.generateTransaction(latestBlock, '27Vsbb84NX6hNgR7kAGwi74BAXV7TdCcHTp', 100000000)
+    return node.generateTransaction('27Vsbb84NX6hNgR7kAGwi74BAXV7TdCcHTp', 100000000, 'TRX', latestBlock)
+  })
+
+  it('Can freeze some TRX', async () => {
+    const res = await fetch('https://api.tronscan.org/api/block?sort=-timestamp&limit=1')
+    const { data } = await res.json()
+    const tx = node1.freeze(10000000, 3, data[0])
+    console.log('Hex is: ', tx.hex)
+    return tx
+  })
+
+  it('Can unfreeze TRX', async () => {
+    const res = await fetch('https://api.tronscan.org/api/block?sort=-timestamp&limit=1')
+    const { data } = await res.json()
+    const tx = node1.unfreeze(data[0])
+    console.log('Hex is: ', tx.hex)
+    return tx
   })
 })

@@ -26,9 +26,16 @@ yarn add @cobo/tron
 * `getPublicExtendedKey` - Return the public extend key (base58)
 * `getAddress` - Return the tron address
 * `generateTransaction` - Return a tron transaction
-  * `latestBlock` - lastest tron block from any api backend
   * `to` - the address you want to send to
   * `amount` - 1000000 = 1 TRX
+  * `token` - default is TRX
+  * `latestBlock` - lastest tron block from any api backend
+* `freeze` - Freeze to get TRON power
+  * `amount` - int, 1000000 = 1 TRX
+  * `duration` - int, how many days, default is 3
+  * `latestBlock` - lastest block info
+* `unfreeze` - Unfreeze all the TRX
+  * `latestBlock` - lastest block info
 
 ```JavaScript
 const latestBlock = {
