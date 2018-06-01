@@ -4,15 +4,16 @@ import bs58 from 'bs58'
 import Jssha from 'jssha'
 const EC = require('elliptic').ec
 
-const prefix = 'a0'
+const prefixTestNet = 'a0'
+const prefix = '41'
 
-export function computeAddress (pubBytes) {
+export function computeAddress (pubBytes, isTestNet = false) {
   if (pubBytes.length === 65) {
     pubBytes = pubBytes.slice(1)
   }
   var hash = sha3.keccak256(pubBytes).toString()
   var addressHex = hash.substring(24)
-  addressHex = prefix + addressHex
+  addressHex = (isTestNet ? prefixTestNet : prefix) + addressHex
   var addressBytes = hexStr2byteArray(addressHex)
   return addressBytes
 }

@@ -28,28 +28,28 @@ class TronWallet {
     return bip39.generateMnemonic()
   }
 
-  static fromMnemonic (mnemonic) {
+  static fromMnemonic (mnemonic, isTestNet = false) {
     const seed = bip39.mnemonicToSeedHex(mnemonic)
-    return new this({ seed })
+    return new this({ seed, isTestNet })
   }
 
-  static fromMasterSeed (seed) {
-    return new this({ seed })
+  static fromMasterSeed (seed, isTestNet = false) {
+    return new this({ seed, isTestNet })
   }
 
-  static fromExtendedKey (extendedKey) {
-    return new this({ extendedKey })
+  static fromExtendedKey (extendedKey, isTestNet = false) {
+    return new this({ extendedKey, isTestNet })
   }
 
-  static fromPrivateKey (privateKey) {
-    return new this({ privateKey })
+  static fromPrivateKey (privateKey, isTestNet = false) {
+    return new this({ privateKey, isTestNet })
   }
 
-  static fromTronPrivateKey (pk) {
-    return new this({ privateKey: Buffer(pk, 'hex') })
+  static fromTronPrivateKey (pk, isTestNet = false) {
+    return new this({ privateKey: Buffer(pk, 'hex'), isTestNet })
   }
 
-  constructor ({ seed, extendedKey, privateKey }) {
+  constructor ({ seed, extendedKey, privateKey, isTestNet }) {
     if (seed) {
       this._seed = seed
       this._node = hdkey.fromMasterSeed(Buffer(seed, 'hex'))
@@ -65,6 +65,7 @@ class TronWallet {
         _privateKey: privateKey
       }
     }
+    this._isTestNet = isTestNet || false
     this._init()
   }
 
@@ -80,13 +81,13 @@ class TronWallet {
   derivePath (path) {
     assert(this._node.derive, 'can not derive when generate from private / public key')
     this._node = this._node.derive(path)
-    return new TronWallet({ extendedKey: this._node.privateExtendedKey })
+    return new TronWallet({ extendedKey: this._node.privateExtendedKey, isTestNet: this._isTestNet })
   }
 
   deriveChild (index) {
     assert(this._node.deriveChild, 'can not derive when generate from private / public key')
     this._node = this._node.deriveChild(index)
-    return new TronWallet({ extendedKey: this._node.privateExtendedKey })
+    return new TronWallet({ extendedKey: this._node.privateExtendedKey, isTestNet: this._isTestNet })
   }
 
   getPrivateExtendedKey () {
@@ -109,7 +110,7 @@ class TronWallet {
   }
 
   getAddress () {
-    const addressBytes = computeAddress(getPubKeyFromPriKey(this._priKeyBytes))
+    const addressBytes = computeAddress(getPubKeyFromPriKey(this._priKeyBytes), this._isTestNet)
     return getBase58CheckAddress(addressBytes)
   }
 
