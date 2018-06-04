@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@tronscan/client@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@tronscan/client/-/client-0.1.1.tgz#5c121e6b114706b0c2f042a9829904e6ff7440e4"
+"@tronscan/client@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@tronscan/client/-/client-0.2.2.tgz#cd728222c33a5e0aa01db1c2c652a9398253c8c2"
   dependencies:
     axios "^0.18.0"
     babel-plugin-transform-class-properties "^6.24.1"

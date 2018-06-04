@@ -6,6 +6,7 @@ const mnemonic = 'cobo wallet is awesome'
 const assert = require('assert')
 const seed = bip39.mnemonicToSeedHex(mnemonic)
 const pk = '43B75088348B0E2F0B5FABC6F43CF5C084B0010FBFA2D86160A70E5AF7E17E56'
+const pk1 = '2193A720B5811BE5E48D8D25CF7473D47E3556A017922ED36CC3A3A137437751'
 
 describe('Tron Wallet', function () {
   it('Can get tron account from HD wallet structure', () => {
@@ -59,7 +60,7 @@ describe('Tron Wallet', function () {
   })
 
   it('Can freeze some TRX', async () => {
-    const node = TronWallet.fromTronPrivateKey(pk, false)
+    const node = TronWallet.fromTronPrivateKey(pk1, false)
     const res = await fetch('https://api.tronscan.org/api/block?sort=-timestamp&limit=1')
     const { data } = await res.json()
     const tx = node.freeze(10000000, 3, data[0])
